@@ -35,6 +35,8 @@ export default function SetupWizard() {
   const [geminiKey, setGeminiKey] = useState('')
   const [name, setName] = useState('The Flame')
 
+  const [useExisting, setUseExisting] = useState(false)
+
   const handleStep1 = async (e) => {
     e.preventDefault()
     if (!pat.trim() || !owner.trim() || !repo.trim()) {
@@ -44,17 +46,19 @@ export default function SetupWizard() {
     setError('')
     setLoading(true)
     try {
-      await createRepo(pat, repo)
-      await new Promise((r) => setTimeout(r, 1200)) // wait for GitHub to init
+      if (!useExisting) {
+        await createRepo(pat, repo)
+        await new Promise((r) => setTimeout(r, 1200))
+      }
       await seedRepo(pat, owner, repo)
       setStep(2)
     } catch (err) {
-      // Try seeding anyway (repo might already exist)
+      // Repo may already exist or PAT lacks repo-creation scope — try seeding anyway
       try {
         await seedRepo(pat, owner, repo)
         setStep(2)
       } catch (err2) {
-        setError(`GitHub error: ${err.message}`)
+        setError(`${err.message}. If your PAT can't create repos, tick "repo already exists" and try again.`)
       }
     } finally {
       setLoading(false)
@@ -134,7 +138,20 @@ export default function SetupWizard() {
               placeholder="battle-dash-data"
               style={inputStyle}
             />
-            {error && <div style={{ fontSize: 9, color: '#ff6b6b', marginBottom: 10 }}>{error}</div>}
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 9, color: '#6b6b75', marginBottom: 10, cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={useExisting}
+                onChange={(e) => setUseExisting(e.target.checked)}
+                style={{ accentColor: '#f5f5f7', width: 11, height: 11 }}
+              />
+              Repo already exists — skip creation
+            </label>
+            <div style={{ fontSize: 9, color: '#3d3d45', lineHeight: 1.7, marginBottom: 12 }}>
+              PAT needs <span style={{ color: '#6b6b75' }}>repo</span> scope (classic token) or{' '}
+              <span style={{ color: '#6b6b75' }}>Repository: Read &amp; Write</span> (fine-grained).
+            </div>
+            {error && <div style={{ fontSize: 9, color: '#ff6b6b', marginBottom: 10, lineHeight: 1.6 }}>{error}</div>}
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
               <button
                 type="button"
@@ -148,7 +165,7 @@ export default function SetupWizard() {
                 disabled={loading}
                 style={{ ...btnStyle, opacity: loading ? 0.5 : 1 }}
               >
-                {loading ? 'CREATING...' : 'CREATE REPO →'}
+                {loading ? 'CONNECTING...' : useExisting ? 'CONNECT REPO →' : 'CREATE REPO →'}
               </button>
             </div>
           </form>
