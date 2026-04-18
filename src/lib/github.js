@@ -37,11 +37,18 @@ export async function writeFile(pat, owner, repo, path, content, sha) {
 }
 
 export async function createRepo(pat, name) {
-  return githubRequest(pat, '/user/repos', 'POST', {
-    name,
-    private: true,
-    auto_init: true,
+  const res = await fetch(`${BASE}/user/repos`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${pat}`,
+      Accept: 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, private: true, auto_init: true }),
   })
+  // 422 = repo already exists — treat as success
+  if (res.status === 422 || res.status === 201 || res.ok) return
+  throw new Error(`GitHub POST /user/repos → ${res.status}`)
 }
 
 export async function seedRepo(pat, owner, repo) {
@@ -52,6 +59,8 @@ export async function seedRepo(pat, owner, repo) {
     'data/config.json': { seeded: true, version: '0.1.0' },
   }
   for (const [path, content] of Object.entries(files)) {
-    await writeFile(pat, owner, repo, path, content, null)
+    // Read existing SHA so we don't get a 422 conflict on existing files
+    const { sha } = await readFile(pat, owner, repo, path)
+    await writeFile(pat, owner, repo, path, content, sha)
   }
 }

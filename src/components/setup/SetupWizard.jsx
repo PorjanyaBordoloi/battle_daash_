@@ -124,11 +124,11 @@ export default function SetupWizard() {
               style={inputStyle}
               autoFocus
             />
-            <label style={labelStyle}>GitHub Username</label>
+            <label style={labelStyle}>GitHub Username (exact, case-sensitive)</label>
             <input
               value={owner}
-              onChange={(e) => setOwner(e.target.value)}
-              placeholder="your-username"
+              onChange={(e) => setOwner(e.target.value.trim())}
+              placeholder="PorjanyaBordoloi"
               style={inputStyle}
             />
             <label style={labelStyle}>Repo Name</label>
