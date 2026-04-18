@@ -3,7 +3,7 @@ import useDailyStore from '../../stores/useDailyStore'
 import useUIStore from '../../stores/useUIStore'
 import useConfigStore from '../../stores/useConfigStore'
 import { addDays } from '../../lib/dates'
-import { breakDownTask } from '../../lib/gemini'
+import { breakDownTask } from '../../lib/groq'
 
 const sigilColors = {
   '·': 'var(--text-tertiary)',
@@ -19,7 +19,7 @@ const sigilColors = {
 export default function BulletEntry({ entry, date }) {
   const { toggleDone, migrateEntry, addEntry } = useDailyStore()
   const { setContextMenu, contextMenu } = useUIStore()
-  const geminiKey = useConfigStore((s) => s.geminiKey)
+  const geminiKey = useConfigStore((s) => s.groqKey)
 
   const handleSigilClick = () => {
     if (entry.sigil === '·' || entry.sigil === '×') {
@@ -61,32 +61,63 @@ export default function BulletEntry({ entry, date }) {
 
   const isDone = entry.done || entry.sigil === '×'
 
+  const isTask = entry.sigil === '·' || entry.sigil === '×'
+
   return (
     <div
       onContextMenu={handleContextMenu}
       style={{
         display: 'flex',
-        alignItems: 'baseline',
+        alignItems: 'center',
         gap: 6,
         padding: '2px 0',
         paddingLeft: (entry.indent || 0) * 16,
         userSelect: 'none',
+        minHeight: 24,
       }}
     >
-      <span
-        onClick={handleSigilClick}
-        style={{
-          fontSize: 11,
-          width: 12,
-          flexShrink: 0,
-          color: isDone ? 'var(--text-dead)' : (sigilColors[entry.sigil] || 'var(--text-tertiary)'),
-          cursor: entry.sigil === '·' || entry.sigil === '×' ? 'pointer' : 'default',
-          fontWeight: 300,
-          lineHeight: 1.4,
-        }}
-      >
-        {isDone ? '×' : entry.sigil}
-      </span>
+      {/* Checkbox — only for task sigils (· ×) */}
+      {isTask ? (
+        <span
+          onClick={handleSigilClick}
+          title={isDone ? 'Mark open' : 'Mark done'}
+          style={{
+            width: 13,
+            height: 13,
+            flexShrink: 0,
+            border: `1px solid ${isDone ? 'var(--border-dim)' : 'var(--border-mid)'}`,
+            borderRadius: 2,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            background: isDone ? 'var(--bg-s3)' : 'transparent',
+            transition: 'border-color 100ms, background 100ms',
+            fontSize: 9,
+            color: isDone ? 'var(--text-ghost)' : 'transparent',
+          }}
+          onMouseEnter={e => { if (!isDone) e.currentTarget.style.borderColor = 'var(--border-bright)' }}
+          onMouseLeave={e => { if (!isDone) e.currentTarget.style.borderColor = 'var(--border-mid)' }}
+        >
+          {isDone ? '×' : ''}
+        </span>
+      ) : (
+        /* Non-task sigil — render as monospace character */
+        <span
+          style={{
+            fontSize: 11,
+            width: 13,
+            flexShrink: 0,
+            color: sigilColors[entry.sigil] || 'var(--text-tertiary)',
+            fontWeight: 300,
+            lineHeight: 1,
+            textAlign: 'center',
+          }}
+        >
+          {entry.sigil}
+        </span>
+      )}
+
       <span
         style={{
           fontSize: 11,

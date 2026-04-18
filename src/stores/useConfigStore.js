@@ -7,12 +7,12 @@ const useConfigStore = create(
       pat: '',
       owner: '',
       repo: '',
-      geminiKey: '',
+      groqKey: '',
       name: 'The Flame',
       isSetup: false,
 
       setConfig: (cfg) => set((s) => ({ ...s, ...cfg })),
-      clearConfig: () => set({ pat: '', owner: '', repo: '', geminiKey: '', name: 'The Flame', isSetup: false }),
+      clearConfig: () => set({ pat: '', owner: '', repo: '', groqKey: '', name: 'The Flame', isSetup: false }),
     }),
     { name: 'bd-config' }
   )

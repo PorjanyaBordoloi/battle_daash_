@@ -32,7 +32,7 @@ export default function SetupWizard() {
   const [pat, setPat] = useState('')
   const [owner, setOwner] = useState('')
   const [repo, setRepo] = useState('battle-dash-data')
-  const [geminiKey, setGeminiKey] = useState('')
+  const [groqKey, setGroqKey] = useState('')
   const [name, setName] = useState('The Flame')
 
   const [useExisting, setUseExisting] = useState(false)
@@ -66,7 +66,7 @@ export default function SetupWizard() {
   }
 
   const handleStep2 = (skip = false) => {
-    if (!skip && !geminiKey.trim()) {
+    if (!skip && !groqKey.trim()) {
       setError('Enter a key or click Skip')
       return
     }
@@ -76,7 +76,7 @@ export default function SetupWizard() {
 
   const handleFinish = (e) => {
     e.preventDefault()
-    setConfig({ pat, owner, repo, geminiKey, name: name.trim() || 'The Flame', isSetup: true })
+    setConfig({ pat, owner, repo, groqKey, name: name.trim() || 'The Flame', isSetup: true })
   }
 
   const stepDots = [1, 2, 3].map((s) => (
@@ -171,22 +171,22 @@ export default function SetupWizard() {
           </form>
         )}
 
-        {/* Step 2: Gemini */}
+        {/* Step 2: Groq */}
         {step === 2 && (
           <div>
             <div style={{ fontSize: 9, letterSpacing: '0.1em', color: '#6b6b75', marginBottom: 16, textTransform: 'uppercase' }}>
-              Step 2 — Gemini AI (optional)
+              Step 2 — Groq AI (optional)
             </div>
-            <label style={labelStyle}>Gemini API Key</label>
+            <label style={labelStyle}>Groq API Key</label>
             <input
-              value={geminiKey}
-              onChange={(e) => setGeminiKey(e.target.value)}
-              placeholder="AIza..."
+              value={groqKey}
+              onChange={(e) => setGroqKey(e.target.value)}
+              placeholder="gsk_..."
               style={inputStyle}
               autoFocus
             />
             <div style={{ fontSize: 9, color: '#3d3d45', marginBottom: 16, lineHeight: 1.6 }}>
-              Used for AI task breakdown. Get a free key at ai.google.dev
+              Powers AI task breakdown + planning. Free tier at console.groq.com
             </div>
             {error && <div style={{ fontSize: 9, color: '#ff6b6b', marginBottom: 10 }}>{error}</div>}
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
