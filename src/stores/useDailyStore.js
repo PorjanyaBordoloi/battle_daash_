@@ -106,6 +106,39 @@ const useDailyStore = create(
         }))
       },
 
+      moveEntry: (fromDate, id, toDate) => {
+        const { entries } = get()
+        const entry = (entries[fromDate] || []).find((e) => e.id === id)
+        if (!entry) return
+        set((s) => ({
+          entries: {
+            ...s.entries,
+            [fromDate]: (s.entries[fromDate] || []).filter((e) => e.id !== id),
+            [toDate]: [...(s.entries[toDate] || []), { ...entry, date: toDate }],
+          },
+        }))
+      },
+
+      moveTimebox: (fromDate, fromHour, toDate, toHour) => {
+        const { timeboxes } = get()
+        const block = timeboxes[fromDate]?.[fromHour]
+        if (!block) return
+        set((s) => {
+          const fromDay = { ...(s.timeboxes[fromDate] || {}) }
+          delete fromDay[fromHour]
+          return {
+            timeboxes: {
+              ...s.timeboxes,
+              [fromDate]: fromDay,
+              [toDate]: {
+                ...(s.timeboxes[toDate] || {}),
+                [toHour]: { ...block, date: toDate, hour: toHour },
+              },
+            },
+          }
+        })
+      },
+
       setDaySha: (date, sha) => {
         set((s) => ({ shas: { ...s.shas, [date]: sha } }))
       },
