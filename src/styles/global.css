@@ -1,0 +1,44 @@
+@import './tokens.css';
+@import './reset.css';
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.section-header__label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+.section-header__line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-dim);
+}
+
+.pill {
+  font-size: 9px;
+  padding: 1px 5px;
+  border: 1px solid var(--border-dim);
+  border-radius: 2px;
+  color: var(--text-tertiary);
+}
+
+.btn-text {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  transition: color var(--transition);
+}
+.btn-text:hover { color: var(--text-primary); }
+
+.scrollable {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-dim) transparent;
+}
