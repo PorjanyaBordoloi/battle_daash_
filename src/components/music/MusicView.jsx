@@ -294,13 +294,16 @@ function SessionsTab() {
   const empty = { trackId: '', trackName: '', daw: 'FL Studio', sessionType: 'production', bpm: '', key: '', duration: '', notes: '' }
   const [form, setForm] = useState(empty)
 
-  const handleAdd = (e) => {
-    e.preventDefault()
+  const [saved, setSaved] = useState(false)
+
+  const handleAdd = () => {
     if (!form.duration) return
     const track = tracks.find(t => t.id === form.trackId)
     addSession({ ...form, trackName: track?.title || form.trackName })
     setForm(empty)
     setShow(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
   }
 
   const f = (k) => (e) => setForm(s => ({ ...s, [k]: e.target.value }))
@@ -309,11 +312,16 @@ function SessionsTab() {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <SectionHeader label="SESSION LOG" />
-        <button style={S.btn} onClick={() => setShow(!show)} onMouseEnter={BTN_OVER} onMouseLeave={BTN_OUT}>+ LOG</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {saved && <span style={{ fontSize: 8, color: '#44aa66', letterSpacing: '0.08em' }}>✓ logged</span>}
+          <button style={S.btn} onClick={() => setShow(!show)} onMouseEnter={BTN_OVER} onMouseLeave={BTN_OUT}>
+            {show ? 'CLOSE' : '+ LOG'}
+          </button>
+        </div>
       </div>
 
       {show && (
-        <form onSubmit={handleAdd} style={{ ...S.card, border: '1px solid var(--border-mid)', marginBottom: 12 }}>
+        <div style={{ ...S.card, border: '1px solid var(--border-mid)', marginBottom: 12 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
             <div style={{ gridColumn: '1/-1' }}>
               <span style={S.label}>track</span>
